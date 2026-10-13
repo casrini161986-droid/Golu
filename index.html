@@ -67,8 +67,12 @@ section { display: flex; flex-direction: column; gap: 10px; scroll-margin-top: 8
 
 /* Player */
 #s-play { position: fixed; inset: 0; z-index: 10; background: var(--night); display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; }
-.p-photo { position: relative; height: 38vh; background: var(--panel-2) center / cover no-repeat; }
-.p-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(14,12,36,0) 40%, var(--night)); }
+.p-photo { position: relative; height: 45vh; background: var(--panel-2) center / cover no-repeat; }
+.p-photo .bg, .p-photo .fg { position: absolute; inset: 0; background: center / cover no-repeat; }
+.p-photo .bg { filter: blur(22px) brightness(.45); transform: scale(1.15); }
+.p-photo .credit { position: absolute; left: 8px; bottom: 6px; z-index: 2; font-size: 10px; color: rgba(255,255,255,.55); max-width: 90%; }
+.p-photo { overflow: hidden; }
+.p-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(14,12,36,0) 75%, var(--night)); }
 .p-body { padding-inline: 20px; padding-block: 8px 12px; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
 .p-body .where { font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
 .p-body h2 { font-size: clamp(28px, 5vw, 52px); line-height: 1.1; }
@@ -82,9 +86,9 @@ section { display: flex; flex-direction: column; gap: 10px; scroll-margin-top: 8
 .p-ctl .spacer { flex: 1; }
 .warn { color: var(--kumkum); font-size: 15px; }
 @media (orientation: landscape) and (min-width: 700px) {
-  #s-play { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); grid-template-rows: minmax(0, 1fr) auto; }
+  #s-play { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
   .p-photo { height: auto; grid-row: 1; }
-  .p-photo::after { background: linear-gradient(to right, rgba(14,12,36,0) 55%, var(--night)); }
+  .p-photo::after { background: linear-gradient(to right, rgba(14,12,36,0) 85%, var(--night)); }
   .p-body { grid-row: 1; padding-block: 5vh 12px; padding-inline: 3vw 4vw; justify-content: center; }
   .p-ctl { grid-column: 1 / -1; }
 }
@@ -109,7 +113,7 @@ section { display: flex; flex-direction: column; gap: 10px; scroll-margin-top: 8
 </div>
 
 <div id="s-play" hidden>
-  <div class="p-photo" id="p-photo"></div>
+  <div class="p-photo" id="p-photo"><div class="bg" id="p-bg"></div><div class="fg" id="p-fg"></div><div class="credit" id="p-credit"></div></div>
   <div class="p-body">
     <div class="where" id="p-where"></div>
     <h2 id="p-name"></h2>
@@ -473,6 +477,41 @@ const UI = {
   bn: { hint: "গল্প শুনতে একটি পুতুল ছুঁয়ে দেখুন", listen: "শুনুন", pause: "থামান", resume: "চালিয়ে যান", next: "পরের পুতুল", back: "গোলুতে ফিরুন", music: "সংগীত", step: "ধাপ", left: "বাঁ দিকে", front: "সামনে বাঁ দিকে", right: "ডান দিকে", novoice: "এই ফোনে বাংলা কণ্ঠ নেই। অনুগ্রহ করে গল্পটি এখানে পড়ুন।" }
 };
 const PHOTO_OF = {};
+/* Real temple / Perumal photos (Wikimedia Commons), keyed by doll id: credit line. Files live in temples/<id>.jpg */
+const TP = {
+ "thavazhum-krishna": "Photo: HanumanSevak2025 · CC BY-SA 4.0 · Wikimedia Commons",
+ "rajagopala": "Photo: Gopala Nivasam · CC BY 4.0 · Wikimedia Commons",
+ "parthasarathi": "Photo: Destination8infinity · CC BY-SA 3.0 · Wikimedia Commons",
+ "marapachi": "Photo: Nvvchar · CC BY-SA 4.0 · Wikimedia Commons",
+ "manavala-mamunigal": "Photo: Raghavan Srirangam · CC BY-SA 4.0 · Wikimedia Commons",
+ "ayodhya-rama": "Photo: Prime Minister's Office · GODL-India · Wikimedia Commons",
+ "tirupati-perumal-thayar": "Photo: K.Venkataramana · CC0 · Wikimedia Commons",
+ "muthangi-balaji": "Photo · CC BY-SA 3.0 · Wikimedia Commons",
+ "guruvayurappan": "Photo: Rajasekharan Parameswaran · CC BY-SA 4.0 · Wikimedia Commons",
+ "gajendra-varada": "Photo: Unknown artistUnknown artist · Public domain · Wikimedia Commons",
+ "ulagalanda": "Photo: Ssriram mt · CC BY-SA 4.0 · Wikimedia Commons",
+ "vithoba": "Photo: Parag Mahalley · CC BY-SA 2.0 · Wikimedia Commons",
+ "uppiliappan": "Photo: Ssriram mt · CC BY-SA 4.0 · Wikimedia Commons",
+ "gitopadesam": "Photo: AnonymousUnknown author · Public domain · Wikimedia Commons",
+ "tapas-anjaneya": "Photo: Adityamadhav83 · CC BY-SA 3.0 · Wikimedia Commons",
+ "hayagriva": "Photo: Venkatarangan T.N.C. · CC BY-SA 4.0 · Wikimedia Commons",
+ "ashtalakshmi": "Photo: User:Sudharsun.j · CC BY-SA 3.0 · Wikimedia Commons",
+ "dashavatara": "Photo: Raja Ravi Varma · Public domain · Wikimedia Commons",
+ "andal": "Photo: Ssriram mt · CC BY-SA 4.0 · Wikimedia Commons",
+ "veeraraghava": "Photo: Ssriram mt · CC BY-SA 4.0 · Wikimedia Commons",
+ "azhwarthirunagari": "Photo: Madhavan. A · CC BY-SA 4.0 · Wikimedia Commons",
+ "srirangam": "Photo: Lodo from Moscow, Russia · CC BY-SA 2.0 · Wikimedia Commons",
+ "nammazhwar": "Photo: Krishna51284 · CC BY-SA 4.0 · Wikimedia Commons",
+ "jagannatha": "Photo · CC BY 4.0 · Wikimedia Commons",
+ "krishna-leela": "Photo: Unknown authorUnknown author · Public domain · Wikimedia Commons",
+ "ahobilam": "Photo: Veera Narayana · CC BY 4.0 · Wikimedia Commons",
+ "kaalinga-nardanam": "Photo · CC0 · Wikimedia Commons",
+ "sudarshana": "Photo: Rajasekhar1961 · CC BY-SA 4.0 · Wikimedia Commons",
+ "ramanuja": "Photo: Yakshitha · CC BY-SA 4.0 · Wikimedia Commons",
+ "thirukolur": "Photo: Vishwa Sundar · CC BY-SA 4.0 · Wikimedia Commons",
+ "natham": "Photo: Ssriram mt · CC BY-SA 4.0 · Wikimedia Commons",
+ "perungulam": "Photo · Wikimedia Commons"
+};
 const photo = id => PH[PHOTO_OF[id] || id] || "";
 
 const $ = s => document.querySelector(s);
@@ -595,7 +634,10 @@ function splitText(t) { return (t.match(/[^.!?।]+[.!?।]+["”']?|[^.!?।]+$
 function play(id) {
   stopAll();
   cur = flat.find(x => x.id === id);
-  $("#p-photo").style.backgroundImage = `url(${photo(id)})`;
+  const tp = TP[id], src = tp ? "temples/" + id + ".jpg" : photo(id);
+  $("#p-bg").style.backgroundImage = $("#p-fg").style.backgroundImage = `url("${src}")`;
+  $("#p-fg").style.backgroundSize = tp ? "contain" : "cover";
+  $("#p-credit").textContent = tp || "";
   $("#p-where").textContent = secLabel(cur.sec);
   $("#p-name").textContent = nameOf(cur);
   sentences = splitText(textOf(cur));
