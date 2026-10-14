@@ -37,9 +37,32 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 /* Opening video: tap to begin (browsers only allow sound after a tap), then the language screen */
 #s-intro { position: fixed; inset: 0; z-index: 20; background: #000; }
 #s-intro video { width: 100%; height: 100%; object-fit: contain; display: block; }
-#i-cover { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; text-align: center; padding: 16px; background: radial-gradient(70% 60% at 50% 40%, rgba(43,36,104,.82), rgba(7,6,26,.94)); }
-#i-cover h1 { font-size: clamp(34px, 7vw, 64px); color: var(--gold); line-height: 1.1; }
-#i-start { background: var(--gold); color: var(--night); border: 0; border-radius: 999px; padding: 18px 44px; font-size: clamp(20px, 3vw, 28px); font-weight: 700; }
+#i-cover { position: absolute; inset: 0; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(10px, 2.2vh, 22px); text-align: center; padding: 70px 16px 90px; background: radial-gradient(60% 55% at 50% 45%, #5a1f3a 0%, #2a1240 45%, #0b0820 100%); transition: opacity .9s ease; }
+#i-cover.go { opacity: 0; pointer-events: none; }
+#i-cover .thoranam { position: absolute; top: 0; left: 0; width: 100%; height: 64px; }
+#i-cover .glow { position: absolute; width: min(80vw, 80vh); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(232,184,79,.28), transparent 65%); animation: breathe 5s ease-in-out infinite; }
+#i-cover .kolam { position: absolute; width: min(92vw, 92vh); aspect-ratio: 1; opacity: .16; animation: spin 120s linear infinite; }
+#i-cover > :not(.thoranam):not(.glow):not(.kolam):not(.petals):not(.diyas) { position: relative; }
+#i-cover .namam { width: 40px; height: 52px; }
+.i-hello { height: 1.6em; font-size: clamp(18px, 3vw, 26px); color: #ffd9a0; }
+.i-hello span { display: inline-block; animation: fadein .8s ease; }
+#i-cover h1 { font-size: clamp(34px, 7.5vw, 76px); line-height: 1.08; color: var(--gold); text-shadow: 0 0 24px rgba(232,184,79,.45), 0 2px 0 #6b3a10; }
+#i-cover h1 small { display: block; font-size: .42em; color: #ffe8bd; letter-spacing: .08em; margin-bottom: .3em; }
+.i-sub { font-size: clamp(16px, 2.4vw, 22px); color: #e9dcff; max-width: 34em; }
+#i-start { background: linear-gradient(#f6cf6d, #d99a2b); color: #3a1500; border: 0; border-radius: 999px; padding: 18px 44px; font-size: clamp(20px, 3vw, 28px); font-weight: 700; box-shadow: 0 0 0 0 rgba(246,207,109,.6); animation: pulse 2.2s ease-out infinite; }
+#i-cover .diyas { position: absolute; left: 0; right: 0; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); display: flex; justify-content: space-evenly; pointer-events: none; }
+.diya { width: clamp(30px, 5vw, 48px); }
+.diya .f { transform-origin: 50% 100%; animation: flicker 1.6s ease-in-out infinite alternate; }
+.diya:nth-child(2n) .f { animation-delay: -.7s; } .diya:nth-child(3n) .f { animation-delay: -1.1s; }
+#i-cover .petals { position: absolute; inset: 0; pointer-events: none; }
+.petal { position: absolute; top: -20px; width: 12px; height: 9px; border-radius: 60% 0 60% 0; opacity: .85; animation: fall linear infinite; }
+@keyframes flicker { from { transform: scale(1, 1) rotate(-3deg); opacity: .9; } to { transform: scale(.88, 1.12) rotate(3deg); opacity: 1; } }
+@keyframes breathe { 50% { transform: scale(1.12); opacity: .7; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 70% { box-shadow: 0 0 0 22px rgba(246,207,109,0); } 100% { box-shadow: 0 0 0 0 rgba(246,207,109,0); } }
+@keyframes fadein { from { opacity: 0; transform: translateY(6px); } }
+@keyframes fall { to { transform: translate(var(--dx, 40px), 110vh) rotate(540deg); } }
+@media (prefers-reduced-motion: reduce) { #i-cover *, #i-cover { animation: none !important; } .petals { display: none; } }
 #i-skip { position: absolute; right: 20px; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); border-radius: 999px; padding: 12px 24px; font-size: 18px; border: 1px solid rgba(255,255,255,.4); background: rgba(0,0,0,.55); color: #fff; }
 #s-lang { min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding-inline: 16px; padding-block: 32px; text-align: center; background: radial-gradient(70% 60% at 50% 30%, var(--panel-2), var(--night) 75%); }
 #s-lang h1 { font-size: clamp(32px, 7vw, 56px); color: var(--gold); line-height: 1.1; }
@@ -105,9 +128,16 @@ section { display: flex; flex-direction: column; gap: 10px; scroll-margin-top: 8
 <div id="s-intro" hidden>
   <video id="iv" src="intro.mp4" playsinline preload="auto"></video>
   <div id="i-cover">
+    <svg class="thoranam" viewBox="0 0 1000 48" preserveAspectRatio="none" aria-hidden="true"><path d="M0 6 H1000" stroke="#8a5a1a" stroke-width="3"/><path d="M10 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M38 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><path d="M66 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M94 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><path d="M122 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M150 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><path d="M178 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M206 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><path d="M234 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M262 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><path d="M290 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M318 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><path d="M346 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M374 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><path d="M402 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M430 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><path d="M458 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M486 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><path d="M514 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M542 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><path d="M570 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M598 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><path d="M626 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M654 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><path d="M682 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M710 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><path d="M738 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M766 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><path d="M794 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M822 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><path d="M850 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M878 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><path d="M906 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M934 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><path d="M962 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#4fae4a"/><path d="M990 6 q-7 18 0 34 q7 -16 0 -34Z" fill="#2f8a3a"/><circle cx="24" cy="8" r="7" fill="#ffd23f"/><circle cx="52" cy="8" r="7" fill="#ff9f1c"/><circle cx="80" cy="8" r="7" fill="#ffd23f"/><circle cx="108" cy="8" r="7" fill="#ff9f1c"/><circle cx="136" cy="8" r="7" fill="#ffd23f"/><circle cx="164" cy="8" r="7" fill="#ff9f1c"/><circle cx="192" cy="8" r="7" fill="#ffd23f"/><circle cx="220" cy="8" r="7" fill="#ff9f1c"/><circle cx="248" cy="8" r="7" fill="#ffd23f"/><circle cx="276" cy="8" r="7" fill="#ff9f1c"/><circle cx="304" cy="8" r="7" fill="#ffd23f"/><circle cx="332" cy="8" r="7" fill="#ff9f1c"/><circle cx="360" cy="8" r="7" fill="#ffd23f"/><circle cx="388" cy="8" r="7" fill="#ff9f1c"/><circle cx="416" cy="8" r="7" fill="#ffd23f"/><circle cx="444" cy="8" r="7" fill="#ff9f1c"/><circle cx="472" cy="8" r="7" fill="#ffd23f"/><circle cx="500" cy="8" r="7" fill="#ff9f1c"/><circle cx="528" cy="8" r="7" fill="#ffd23f"/><circle cx="556" cy="8" r="7" fill="#ff9f1c"/><circle cx="584" cy="8" r="7" fill="#ffd23f"/><circle cx="612" cy="8" r="7" fill="#ff9f1c"/><circle cx="640" cy="8" r="7" fill="#ffd23f"/><circle cx="668" cy="8" r="7" fill="#ff9f1c"/><circle cx="696" cy="8" r="7" fill="#ffd23f"/><circle cx="724" cy="8" r="7" fill="#ff9f1c"/><circle cx="752" cy="8" r="7" fill="#ffd23f"/><circle cx="780" cy="8" r="7" fill="#ff9f1c"/><circle cx="808" cy="8" r="7" fill="#ffd23f"/><circle cx="836" cy="8" r="7" fill="#ff9f1c"/><circle cx="864" cy="8" r="7" fill="#ffd23f"/><circle cx="892" cy="8" r="7" fill="#ff9f1c"/><circle cx="920" cy="8" r="7" fill="#ffd23f"/><circle cx="948" cy="8" r="7" fill="#ff9f1c"/><circle cx="976" cy="8" r="7" fill="#ffd23f"/></svg>
+    <div class="glow"></div>
+    <svg class="kolam" viewBox="-100 -100 200 200" aria-hidden="true" fill="none" stroke="#ffd9a0" stroke-width="1.2"><ellipse rx="88" ry="30" transform="rotate(0)"/><ellipse rx="88" ry="30" transform="rotate(22)"/><ellipse rx="88" ry="30" transform="rotate(44)"/><ellipse rx="88" ry="30" transform="rotate(66)"/><ellipse rx="88" ry="30" transform="rotate(88)"/><ellipse rx="88" ry="30" transform="rotate(110)"/><ellipse rx="88" ry="30" transform="rotate(132)"/><ellipse rx="88" ry="30" transform="rotate(154)"/><ellipse rx="88" ry="30" transform="rotate(176)"/><circle r="96"/><circle r="60"/><circle r="20"/></svg>
+    <div class="petals" id="i-petals"></div>
     <svg class="namam" viewBox="0 0 34 44" aria-hidden="true"><path class="u" d="M6 4 V24 Q6 38 17 38 Q28 38 28 24 V4"/><line class="r" x1="17" y1="6" x2="17" y2="32"/></svg>
-    <h1>Sri Vaikunda Yatra</h1>
-    <button id="i-start">&#9654;&nbsp; Begin</button>
+    <div class="i-hello" id="i-hello"><span>&#x0BA8;&#x0BB2;&#x0BCD;&#x0BB5;&#x0BB0;&#x0BB5;&#x0BC1;</span></div>
+    <h1><small>Welcome to our</small>Navarathri Golu</h1>
+    <p class="i-sub">Come walk with us on the Sri Vaikunda Yatra, and hear each Perumal speak to you.</p>
+    <button id="i-start">&#9654;&nbsp; Begin the Yatra</button>
+    <div class="diyas"><svg class="diya" viewBox="0 0 40 40" aria-hidden="true"><path class="f" d="M20 4 C26 13 25 19 20 21 C15 19 14 13 20 4Z" fill="#ffc94a"/><path d="M2 24 Q20 22 38 24 Q34 36 20 36 Q6 36 2 24Z" fill="#c4622d"/><path d="M2 24 Q20 22 38 24" stroke="#ffe1a0" stroke-width="1.5" fill="none"/></svg><svg class="diya" viewBox="0 0 40 40" aria-hidden="true"><path class="f" d="M20 4 C26 13 25 19 20 21 C15 19 14 13 20 4Z" fill="#ffc94a"/><path d="M2 24 Q20 22 38 24 Q34 36 20 36 Q6 36 2 24Z" fill="#c4622d"/><path d="M2 24 Q20 22 38 24" stroke="#ffe1a0" stroke-width="1.5" fill="none"/></svg><svg class="diya" viewBox="0 0 40 40" aria-hidden="true"><path class="f" d="M20 4 C26 13 25 19 20 21 C15 19 14 13 20 4Z" fill="#ffc94a"/><path d="M2 24 Q20 22 38 24 Q34 36 20 36 Q6 36 2 24Z" fill="#c4622d"/><path d="M2 24 Q20 22 38 24" stroke="#ffe1a0" stroke-width="1.5" fill="none"/></svg><svg class="diya" viewBox="0 0 40 40" aria-hidden="true"><path class="f" d="M20 4 C26 13 25 19 20 21 C15 19 14 13 20 4Z" fill="#ffc94a"/><path d="M2 24 Q20 22 38 24 Q34 36 20 36 Q6 36 2 24Z" fill="#c4622d"/><path d="M2 24 Q20 22 38 24" stroke="#ffe1a0" stroke-width="1.5" fill="none"/></svg><svg class="diya" viewBox="0 0 40 40" aria-hidden="true"><path class="f" d="M20 4 C26 13 25 19 20 21 C15 19 14 13 20 4Z" fill="#ffc94a"/><path d="M2 24 Q20 22 38 24 Q34 36 20 36 Q6 36 2 24Z" fill="#c4622d"/><path d="M2 24 Q20 22 38 24" stroke="#ffe1a0" stroke-width="1.5" fill="none"/></svg><svg class="diya" viewBox="0 0 40 40" aria-hidden="true"><path class="f" d="M20 4 C26 13 25 19 20 21 C15 19 14 13 20 4Z" fill="#ffc94a"/><path d="M2 24 Q20 22 38 24 Q34 36 20 36 Q6 36 2 24Z" fill="#c4622d"/><path d="M2 24 Q20 22 38 24" stroke="#ffe1a0" stroke-width="1.5" fill="none"/></svg><svg class="diya" viewBox="0 0 40 40" aria-hidden="true"><path class="f" d="M20 4 C26 13 25 19 20 21 C15 19 14 13 20 4Z" fill="#ffc94a"/><path d="M2 24 Q20 22 38 24 Q34 36 20 36 Q6 36 2 24Z" fill="#c4622d"/><path d="M2 24 Q20 22 38 24" stroke="#ffe1a0" stroke-width="1.5" fill="none"/></svg></div>
   </div>
   <button id="i-skip" hidden>Skip &rsaquo;</button>
 </div>
@@ -747,9 +777,13 @@ function poke() { clearTimeout(idle); idle = setTimeout(() => { if (!$("#s-golu"
 
 /* Opening video */
 const iv = $("#iv");
-function showIntro() { iv.pause(); iv.currentTime = 0; $("#i-cover").hidden = false; $("#i-skip").hidden = true; show("s-intro"); }
+// Welcome screen: greeting cycles through the guide's languages; marigold and jasmine petals drift down
+const HELLO = ["நல்வரவு", "स्वागत है", "స్వాగతం", "ಸುಸ್ವಾಗತ", "സ്വാഗതം", "স্বাগতম"];
+let hi = 0; setInterval(() => { if ($("#i-cover").hidden || $("#s-intro").hidden) return; hi = (hi + 1) % HELLO.length; $("#i-hello").innerHTML = "<span>" + HELLO[hi] + "</span>"; }, 2200);
+for (let k = 0; k < 26; k++) { const p = document.createElement("i"); p.className = "petal"; p.style.left = Math.random() * 100 + "%"; p.style.background = ["#ff9f1c", "#ffd23f", "#fff6e0", "#ff6b6b"][k % 4]; p.style.animationDuration = 7 + Math.random() * 8 + "s"; p.style.animationDelay = -Math.random() * 15 + "s"; p.style.setProperty("--dx", (Math.random() * 160 - 80) + "px"); $("#i-petals").appendChild(p); }
+function showIntro() { iv.pause(); iv.currentTime = 0; $("#i-cover").hidden = false; $("#i-cover").classList.remove("go"); $("#i-skip").hidden = true; show("s-intro"); }
 function endIntro() { iv.pause(); show("s-lang"); poke(); }
-$("#i-start").onclick = () => { $("#i-cover").hidden = true; $("#i-skip").hidden = false; iv.currentTime = 0; iv.play().catch(endIntro); };
+$("#i-start").onclick = () => { $("#i-cover").classList.add("go"); setTimeout(() => $("#i-cover").hidden = true, 900); $("#i-skip").hidden = false; iv.currentTime = 0; iv.play().catch(endIntro); };
 $("#i-skip").onclick = endIntro;
 iv.onended = endIntro;
 iv.onerror = () => { if (!$("#s-intro").hidden) endIntro(); };
@@ -758,5 +792,3 @@ iv.onerror = () => { if (!$("#s-intro").hidden) endIntro(); };
 setLang(lang);
 if (location.hash.slice(1) && UI[location.hash.slice(1)]) show("s-golu"); else showIntro();
 </script>
-
-</html>
