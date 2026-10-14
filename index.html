@@ -783,7 +783,7 @@ let hi = 0; setInterval(() => { if ($("#i-cover").hidden || $("#s-intro").hidden
 for (let k = 0; k < 26; k++) { const p = document.createElement("i"); p.className = "petal"; p.style.left = Math.random() * 100 + "%"; p.style.background = ["#ff9f1c", "#ffd23f", "#fff6e0", "#ff6b6b"][k % 4]; p.style.animationDuration = 7 + Math.random() * 8 + "s"; p.style.animationDelay = -Math.random() * 15 + "s"; p.style.setProperty("--dx", (Math.random() * 160 - 80) + "px"); $("#i-petals").appendChild(p); }
 function showIntro() { iv.pause(); iv.currentTime = 0; $("#i-cover").hidden = false; $("#i-cover").classList.remove("go"); $("#i-skip").hidden = true; show("s-intro"); }
 function endIntro() { iv.pause(); show("s-lang"); poke(); }
-$("#i-start").onclick = () => { $("#i-cover").classList.add("go"); setTimeout(() => $("#i-cover").hidden = true, 900); $("#i-skip").hidden = false; iv.currentTime = 0; iv.play().catch(endIntro); };
+$("#i-start").onclick = () => { const d = document.documentElement; if (d.requestFullscreen && !document.fullscreenElement) d.requestFullscreen().catch(() => {}); $("#i-cover").classList.add("go"); setTimeout(() => $("#i-cover").hidden = true, 900); $("#i-skip").hidden = false; iv.currentTime = 0; iv.play().catch(endIntro); };
 $("#i-skip").onclick = endIntro;
 iv.onended = endIntro;
 iv.onerror = () => { if (!$("#s-intro").hidden) endIntro(); };
