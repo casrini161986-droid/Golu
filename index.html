@@ -34,6 +34,13 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 .namam .r { stroke: var(--kumkum); stroke-width: 5; stroke-linecap: round; }
 
 /* Language screen */
+/* Opening video: tap to begin (browsers only allow sound after a tap), then the language screen */
+#s-intro { position: fixed; inset: 0; z-index: 20; background: #000; }
+#s-intro video { width: 100%; height: 100%; object-fit: contain; display: block; }
+#i-cover { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; text-align: center; padding: 16px; background: radial-gradient(70% 60% at 50% 40%, rgba(43,36,104,.82), rgba(7,6,26,.94)); }
+#i-cover h1 { font-size: clamp(34px, 7vw, 64px); color: var(--gold); line-height: 1.1; }
+#i-start { background: var(--gold); color: var(--night); border: 0; border-radius: 999px; padding: 18px 44px; font-size: clamp(20px, 3vw, 28px); font-weight: 700; }
+#i-skip { position: absolute; right: 20px; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); border-radius: 999px; padding: 12px 24px; font-size: 18px; border: 1px solid rgba(255,255,255,.4); background: rgba(0,0,0,.55); color: #fff; }
 #s-lang { min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding-inline: 16px; padding-block: 32px; text-align: center; background: radial-gradient(70% 60% at 50% 30%, var(--panel-2), var(--night) 75%); }
 #s-lang h1 { font-size: clamp(32px, 7vw, 56px); color: var(--gold); line-height: 1.1; }
 #s-lang p { margin: 0; color: var(--muted); max-width: 30em; }
@@ -94,6 +101,16 @@ section { display: flex; flex-direction: column; gap: 10px; scroll-margin-top: 8
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
 </style>
+
+<div id="s-intro" hidden>
+  <video id="iv" src="intro.mp4" playsinline preload="auto"></video>
+  <div id="i-cover">
+    <svg class="namam" viewBox="0 0 34 44" aria-hidden="true"><path class="u" d="M6 4 V24 Q6 38 17 38 Q28 38 28 24 V4"/><line class="r" x1="17" y1="6" x2="17" y2="32"/></svg>
+    <h1>Sri Vaikunda Yatra</h1>
+    <button id="i-start">&#9654;&nbsp; Begin</button>
+  </div>
+  <button id="i-skip" hidden>Skip &rsaquo;</button>
+</div>
 
 <div id="s-lang">
   <svg class="namam" viewBox="0 0 34 44" aria-hidden="true"><path class="u" d="M6 4 V24 Q6 38 17 38 Q28 38 28 24 V4"/><line class="r" x1="17" y1="6" x2="17" y2="32"/></svg>
@@ -534,7 +551,7 @@ const nameOf = it => lang === "en" ? it.name : TR[lang][it.id][0];
 const textOf = it => lang === "en" ? it.text : TR[lang][it.id][1];
 const secLabel = s => s.id.startsWith("step") ? T("step") + " " + s.id.slice(4) : T(s.id);
 
-function show(id) { ["s-lang", "s-golu", "s-play"].forEach(x => $("#" + x).hidden = x !== id); }
+function show(id) { ["s-intro", "s-lang", "s-golu", "s-play"].forEach(x => $("#" + x).hidden = x !== id); }
 
 /* Language screen */
 LANGS.forEach(l => {
@@ -726,11 +743,20 @@ $("#p-music").onclick = () => { musicOn = !musicOn; $("#p-music").setAttribute("
 
 /* After a quiet spell on the Golu screen, go back to the language choice for the next guest */
 let idle = null;
-function poke() { clearTimeout(idle); idle = setTimeout(() => { if (!$("#s-golu").hidden) { show("s-lang"); scrollTo(0, 0); } }, 120000); }
+function poke() { clearTimeout(idle); idle = setTimeout(() => { if (!$("#s-golu").hidden || !$("#s-lang").hidden) { showIntro(); scrollTo(0, 0); } }, 120000); }
+
+/* Opening video */
+const iv = $("#iv");
+function showIntro() { iv.pause(); iv.currentTime = 0; $("#i-cover").hidden = false; $("#i-skip").hidden = true; show("s-intro"); }
+function endIntro() { iv.pause(); show("s-lang"); poke(); }
+$("#i-start").onclick = () => { $("#i-cover").hidden = true; $("#i-skip").hidden = false; iv.currentTime = 0; iv.play().catch(endIntro); };
+$("#i-skip").onclick = endIntro;
+iv.onended = endIntro;
+iv.onerror = () => { if (!$("#s-intro").hidden) endIntro(); };
 ["click", "scroll", "touchstart"].forEach(e => addEventListener(e, poke, { passive: true }));
 
 setLang(lang);
-if (location.hash.slice(1) && UI[location.hash.slice(1)]) show("s-golu"); else show("s-lang");
+if (location.hash.slice(1) && UI[location.hash.slice(1)]) show("s-golu"); else showIntro();
 </script>
 
 </html>
