@@ -695,10 +695,11 @@ function splitText(t) { return (t.match(/[^.!?।]+[.!?।]+["”']?|[^.!?।]+$
 function play(id) {
   stopAll();
   cur = flat.find(x => x.id === id);
-  const tp = TP[id], src = tp ? "temples/" + id + ".jpg" : photo(id);
-  $("#p-bg").style.backgroundImage = $("#p-fg").style.backgroundImage = `url("${src}")`;
-  $("#p-fg").style.backgroundSize = tp ? "contain" : "cover";
-  $("#p-credit").textContent = tp || "";
+  // Show Srini's own Golu doll while the Perumal speaks (small card photo first, the sharp one replaces it once loaded)
+  const src = "dolls/" + id + ".jpg";
+  $("#p-bg").style.backgroundImage = $("#p-fg").style.backgroundImage = `url("${src}"), url("${photo(id)}")`;
+  $("#p-fg").style.backgroundSize = "contain";
+  $("#p-credit").textContent = "";
   $("#p-where").textContent = secLabel(cur.sec);
   $("#p-name").textContent = nameOf(cur);
   sentences = splitText(textOf(cur));
